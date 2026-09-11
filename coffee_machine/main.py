@@ -2,10 +2,6 @@ from art import gen_art
 from recipe import MENU
 
 def make_coffee(order, charge, money):
-    for item in resources:
-        if item in MENU[order]["ingredients"]:
-            resources[item] = resources[item] - MENU[order]["ingredients"][item]
-
     print("Please insert coins.")
     try:
         quarters = int(input("How many quarters? "))
@@ -14,21 +10,20 @@ def make_coffee(order, charge, money):
         pennies = int(input("How many pennies? "))
     except ValueError:
         print("You entered a Non-Numerical Input.")
-        for item in resources:
-            if item in MENU[order]["ingredients"]:
-                resources[item] = resources[item] + MENU[order]["ingredients"][item]
         money -= charge
         return money
-    
+
     total = round(quarters * 0.25 + dimes * 0.1 + nickels * 0.05 + pennies * 0.01, 2)
-    
     if total < charge:
         print("That's not Enough! Money refunded.\n")
         money -= charge
         return money
     else:
+        for item in resources:
+            if item in MENU[order]["ingredients"]:
+                resources[item] = resources[item] - MENU[order]["ingredients"][item]
         change = round(total - charge, 2)
-        print(f"Here's your change ${change} and your ☕{order}!\n")
+        print(f"Here's your change ${change} and your ☕ {order}!\n")
         return money
 
 
@@ -44,7 +39,7 @@ def order(user_query, money):
             print(f"Sorry there isn't enough {need_a_refill}.\n")
             return money
     else:
-        print("Sorry! That's not on the MENU.\n")
+        print(f"Sorry! {user_query.title()} is not on the MENU.\n")
         return money
 
     money += MENU[user_query]["cost"]
