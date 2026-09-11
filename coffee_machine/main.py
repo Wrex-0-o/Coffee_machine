@@ -1,7 +1,11 @@
 from art import gen_art
 from recipe import MENU
 
-def make_coffee(order, charge):
+def make_coffee(order, charge, money):
+    for item in resources:
+        if item in MENU[order]["ingredients"]:
+            resources[item] = resources[item] - MENU[order]["ingredients"][item]
+
     print("Please insert coins.")
     quarters = int(input("How many quarters? "))
     dimes = int(input("How many dimes? "))
@@ -9,31 +13,38 @@ def make_coffee(order, charge):
     pennies = int(input("How many pennies? "))
 
     total = round(quarters * 0.25 + dimes * 0.1 + nickels * 0.05 + pennies * 0.01, 2)
-
+    
     if total < charge:
-        print("That's not Enough! Money refunded.")
-        return
+        print("That's not Enough! Money refunded.\n")
+        money -= charge
+        return money
     else:
         change = round(total - charge, 2)
-        print(f"Here's your change ${change} and your {order}!")
-        return
+        print(f"Here's your change ${change} and your ☕{order}!\n")
+        return money
 
 
 
-def order(user_query):  
+def order(user_query, money):  
+    need_a_refill = []
     if user_query in MENU:
         for ingredient in MENU[user_query]["ingredients"]:
             for on_hand in resources:
                 if ingredient == on_hand and resources[on_hand] < MENU[user_query]["ingredients"][ingredient]:
-                    print(f"Sorry there isn't enough {on_hand}.")
-                    return              
+                    need_a_refill.append(ingredient)          
+        if need_a_refill != []:
+            print(f"Sorry there isn't enough {need_a_refill}.\n")
+            return money
     else:
-        print("Sorry! That's not on the MENU.")
-        return
-    
-    print(f"It's ${MENU[user_query]["cost"]} for {user_query}.")
-    make_coffee(user_query, MENU[user_query]["cost"])
-    return
+        print("Sorry! That's not on the MENU.\n")
+        return money
+
+    money += MENU[user_query]["cost"]
+    print(f"\nIt's ${MENU[user_query]["cost"]} for {user_query}.\n")
+    money = make_coffee(user_query, MENU[user_query]["cost"], money)
+    return money
+
+
 
 def coffee_machine():
     print(gen_art)
@@ -46,9 +57,9 @@ def coffee_machine():
             print("Thank you for using our machine!")
             machine_on = False
         elif user_query == "report":
-            print(f"Water: {resources["water"]}ml \nMilk: {resources["milk"]}ml \nCoffee: {resources["coffee"]}g \nMoney: ${money}")
+            print(f"\nWater: {resources["water"]}ml \nMilk: {resources["milk"]}ml \nCoffee: {resources["coffee"]}g \nMoney: ${money}\n")
         else:
-            order(user_query)
+            money = order(user_query, money)
 
 
 resources = {
