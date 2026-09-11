@@ -7,11 +7,19 @@ def make_coffee(order, charge, money):
             resources[item] = resources[item] - MENU[order]["ingredients"][item]
 
     print("Please insert coins.")
-    quarters = int(input("How many quarters? "))
-    dimes = int(input("How many dimes? "))
-    nickels = int(input("How many nickels? "))
-    pennies = int(input("How many pennies? "))
-
+    try:
+        quarters = int(input("How many quarters? "))
+        dimes = int(input("How many dimes? "))
+        nickels = int(input("How many nickels? "))
+        pennies = int(input("How many pennies? "))
+    except ValueError:
+        print("You entered a Non-Numerical Input.")
+        for item in resources:
+            if item in MENU[order]["ingredients"]:
+                resources[item] = resources[item] + MENU[order]["ingredients"][item]
+        money -= charge
+        return money
+    
     total = round(quarters * 0.25 + dimes * 0.1 + nickels * 0.05 + pennies * 0.01, 2)
     
     if total < charge:
